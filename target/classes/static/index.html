@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Controle da Lâmpada</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .lampada-container {
+            text-align: center;
+        }
+        .lampada {
+            width: 100px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #333; /* desligada inicialmente */
+            position: relative;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease-in-out;
+        }
+        .lampada.on {
+            background-color: #ffff00;  /* Cor da lâmpada ligada */
+        }
+        .lampada.off {
+            background-color: #333; /* Cor da lâmpada desligada */
+        }
+        .lampada .base {
+            width: 50px;
+            height: 20px;
+            background-color: #888;
+            border-radius: 10px;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .lampada-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        .lampada-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="lampada-container">
+    <div id="lampada" class="lampada off">
+        <div class="base"></div>
+    </div>
+    <button id="toggleButton" class="lampada-button">Ligar</button>
+</div>
+
+<script>
+    const lampada = document.getElementById('lampada');
+    const toggleButton = document.getElementById('toggleButton');
+
+    async function ligarLed() {
+        const response = await fetch('/ligar');
+        return response.text();
+    }
+
+    async function desligarLed() {
+        const response = await fetch('/desligar');
+        return response.text();
+    }
+
+    async function toggleLampada() {
+        if (lampada.classList.contains('off')) {
+            // Tenta ligar o LED via backend
+            try {
+                const resultado = await ligarLed();
+                console.log(resultado); // opcional: mostra resposta no console
+                lampada.classList.remove('off');
+                lampada.classList.add('on');
+                toggleButton.textContent = 'Desligar';
+            } catch (error) {
+                alert('Erro ao ligar LED');
+                console.error(error);
+            }
+        } else {
+            // Tenta desligar o LED via backend
+            try {
+                const resultado = await desligarLed();
+                console.log(resultado);
+                lampada.classList.remove('on');
+                lampada.classList.add('off');
+                toggleButton.textContent = 'Ligar';
+            } catch (error) {
+                alert('Erro ao desligar LED');
+                console.error(error);
+            }
+        }
+    }
+
+    toggleButton.addEventListener('click', toggleLampada);
+</script>
+
+</body>
+</html>
